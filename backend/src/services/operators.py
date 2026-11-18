@@ -32,10 +32,19 @@ def validate_steps(steps):
    fields=set(keys)|{step['aggregate']};grouped=True
  return steps
 
+class ExecutionCancelled(Exception):
+ """运行中任务收到取消信号，在算子步边界停止；不保存任何结果。"""
+
 def checksum(rows):return hashlib.sha256(json.dumps(rows,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
-def execute(dataset,steps):
+# 测试钩子：每个算子步边界额外停留的秒数，生产保持 0；不影响确定性结果
+STEP_DELAY=0.0
+def execute(dataset,steps,check_cancel=None):
  validate_steps(steps);rows=[];trace=[];total_started=time.perf_counter();reads=0
+ def checkpoint():
+  if STEP_DELAY:time.sleep(STEP_DELAY)
+  if check_cancel and check_cancel():raise ExecutionCancelled('任务已取消，计算在算子步边界停止，未保存结果')
  for step in steps:
+  checkpoint()
   before=len(rows);started=time.perf_counter();detail={}
   if step['op']=='scan':
    rows=[dict(r) for r in dataset['readings']];reads+=len(rows);detail={'source':'readings','scanned_rows':len(rows)}

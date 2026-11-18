@@ -6,6 +6,10 @@ x-app: &app
     REDIS_URL: redis://redis:6379/0
     JWT_SECRET: ${JWT_SECRET:-operator-trace-local-demo-secret-change-before-use}
     SEED_DEMO: ${SEED_DEMO:-true}
+    DEFAULT_GLOBAL_CAPACITY: ${DEFAULT_GLOBAL_CAPACITY:-8}
+    DEFAULT_DATASET_CAPACITY: ${DEFAULT_DATASET_CAPACITY:-6}
+    WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+    WORKER_IDLE_POLL: ${WORKER_IDLE_POLL:-1.0}
   volumes:
     - artifacts:/artifacts
   depends_on:

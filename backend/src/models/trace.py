@@ -10,4 +10,8 @@ class Trace(Base):
  result=Column(JSON,nullable=True)
  error=Column(String(1000),nullable=True)
  snapshot=Column(JSON,nullable=False)
+ # 提交时申报的资源份额（确定公式计算，不可变）
+ share=Column(Integer,nullable=True)
+ # 取消信号确认时间：排队任务为出队时刻，运行任务为计算停止归还份额时刻
+ cancelled_at=Column(DateTime,nullable=True)
  created_at=Column(DateTime,server_default=func.now())
